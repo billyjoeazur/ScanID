@@ -71,3 +71,4 @@ C:\Users\JAO\source\repos\ScanID\ScanID\obj\Debug\ScanID.csproj.CoreCompileInput
 C:\Users\JAO\source\repos\ScanID\ScanID\obj\Debug\ScanID.csproj.CopyComplete
 C:\Users\JAO\source\repos\ScanID\ScanID\obj\Debug\ScanID.exe
 C:\Users\JAO\source\repos\ScanID\ScanID\obj\Debug\ScanID.pdb
+C:\Users\JAO\source\repos\ScanID\ScanID\obj\Debug\ScanID.csprojAssemblyReference.cache

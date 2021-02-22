@@ -47,6 +47,9 @@ namespace ScanID
 			MySqlDataAdapter adapterEMP = new MySqlDataAdapter();
 			DataTable tableEMP = new DataTable();
 
+			MySqlDataAdapter adapterEMPattendance = new MySqlDataAdapter();
+			DataTable tableEMPattendance = new DataTable();
+
 			MySqlCommand commandELEM = new MySqlCommand("SELECT * FROM `elementary` WHERE `lrn` = @search", db.getConnection);
 			commandELEM.Parameters.Add("@search", MySqlDbType.VarChar).Value = SearchBox.Text;
 
@@ -65,6 +68,9 @@ namespace ScanID
 			MySqlCommand commandEMP = new MySqlCommand("SELECT * FROM `employee` WHERE `idnumber` = @search", db.getConnection);
 			commandEMP.Parameters.Add("@search", MySqlDbType.VarChar).Value = SearchBox.Text;
 
+			MySqlCommand commandEMPattendance = new MySqlCommand("SELECT * FROM `employeeattendance` WHERE `idno` = @search", db.getConnection);
+			commandEMPattendance.Parameters.Add("@search", MySqlDbType.VarChar).Value = SearchBox.Text;
+
 			adapterELEM.SelectCommand = commandELEM;
 			adapterELEM.Fill(tableELEM);
 
@@ -82,6 +88,9 @@ namespace ScanID
 
 			adapterEMP.SelectCommand = commandEMP;
 			adapterEMP.Fill(tableEMP);
+
+			adapterEMPattendance.SelectCommand = commandEMPattendance;
+			adapterEMPattendance.Fill(tableEMPattendance);
 
 
 			if (tableELEM.Rows.Count > 0)
@@ -260,6 +269,40 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+
+				DateTime today = DateTime.Now;
+				
+				if(tableEMPattendance.Rows.Count == 0)
+				{
+					TryAdd(SearchBox.Text, today.ToLongDateString(), today.ToLongTimeString());
+				}
+				else
+				{
+					if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][4].ToString() == "")
+					{
+						TryUpdate(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+					}
+					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][5].ToString() == "")
+					{
+						TryUpdateIN2(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+					}
+					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][6].ToString() == "")
+					{
+						TryUpdateOUT2(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+					}
+					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][7].ToString() == "")
+					{
+						TryUpdateIN3(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+					}
+					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][8].ToString() == "")
+					{
+						TryUpdateOUT3(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+					}
+
+
+				}
+				//label2.Text = tableEMPattendance.Rows[0][4].ToString();
+				//label3.Text = "";
 			}
 
 			else
@@ -278,6 +321,113 @@ namespace ScanID
 			{
 				MyQuery();
 				SelectSearchBox();
+			}
+		}
+
+		private void Form1_Load(object sender, EventArgs e)
+		{
+
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			
+		}
+
+		private void TryAdd(string idno, string datetoday, string in1)
+		{
+			MySqlCommand command = new MySqlCommand("INSERT INTO `employeeattendance`(`idno`, `datetoday`, `in1`) VALUES (@idno,@datetoday,@in1)", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@datetoday", MySqlDbType.VarChar).Value = datetoday;
+			command.Parameters.Add("@in1", MySqlDbType.VarChar).Value = in1;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
+			}
+		}
+
+		private void TryUpdate(string idno, string out1)
+		{
+			MySqlCommand command = new MySqlCommand("UPDATE `employeeattendance` SET `out1`=@out1 WHERE `idno`=@idno", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@out1", MySqlDbType.VarChar).Value = out1;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
+			}
+		}
+
+		private void TryUpdateIN2(string idno, string in2)
+		{
+			MySqlCommand command = new MySqlCommand("UPDATE `employeeattendance` SET `in2`=@in2 WHERE `idno`=@idno", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@in2", MySqlDbType.VarChar).Value = in2;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
+			}
+		}
+
+		private void TryUpdateOUT2(string idno, string out2)
+		{
+			MySqlCommand command = new MySqlCommand("UPDATE `employeeattendance` SET `out2`=@out2 WHERE `idno`=@idno", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@out2", MySqlDbType.VarChar).Value = out2;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
+			}
+		}
+
+		private void TryUpdateIN3(string idno, string in3)
+		{
+			MySqlCommand command = new MySqlCommand("UPDATE `employeeattendance` SET `in3`=@in3 WHERE `idno`=@idno", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@in3", MySqlDbType.VarChar).Value = in3;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
+			}
+		}
+
+		private void TryUpdateOUT3(string idno, string out3)
+		{
+			MySqlCommand command = new MySqlCommand("UPDATE `employeeattendance` SET `out3`=@out3 WHERE `idno`=@idno", db.getConnection);
+			command.Parameters.Add("@idno", MySqlDbType.VarChar).Value = idno;
+			command.Parameters.Add("@out3", MySqlDbType.VarChar).Value = out3;
+			db.openConnection();
+			if (command.ExecuteNonQuery() == 1)
+			{
+				db.closeConnection();
+			}
+			else
+			{
+				db.closeConnection();
 			}
 		}
 	}
