@@ -29,6 +29,7 @@ namespace ScanID
 
 		public void MyQuery()
 		{
+			DateTime datetoday = DateTime.Now;
 			MySqlDataAdapter adapterELEM = new MySqlDataAdapter();
 			DataTable tableELEM = new DataTable();
 
@@ -68,8 +69,9 @@ namespace ScanID
 			MySqlCommand commandEMP = new MySqlCommand("SELECT * FROM `employee` WHERE `idnumber` = @search", db.getConnection);
 			commandEMP.Parameters.Add("@search", MySqlDbType.VarChar).Value = SearchBox.Text;
 
-			MySqlCommand commandEMPattendance = new MySqlCommand("SELECT * FROM `employeeattendance` WHERE `idno` = @search", db.getConnection);
+			MySqlCommand commandEMPattendance = new MySqlCommand("SELECT * FROM `employeeattendance` WHERE `idno` = @search AND `datetoday` = @datetoday", db.getConnection);
 			commandEMPattendance.Parameters.Add("@search", MySqlDbType.VarChar).Value = SearchBox.Text;
+			commandEMPattendance.Parameters.Add("@datetoday", MySqlDbType.VarChar).Value = datetoday.ToLongDateString();
 
 			adapterELEM.SelectCommand = commandELEM;
 			adapterELEM.Fill(tableELEM);
@@ -117,6 +119,7 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+				timeInOut.Text = "";
 			}
 			else if (tableJR.Rows.Count > 0)
 			{
@@ -142,6 +145,7 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+				timeInOut.Text = "";
 
 			}
 			else if (tableSR.Rows.Count > 0)
@@ -168,6 +172,7 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+				timeInOut.Text = "";
 			}
 			else if (tableCOL.Rows.Count > 0)
 			{
@@ -205,6 +210,7 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+				timeInOut.Text = "";
 			}
 			else if (tableMAS.Rows.Count > 0)
 			{
@@ -242,6 +248,8 @@ namespace ScanID
 				MemoryStream barcode = new MemoryStream(bar);
 				pictureBox2.Image = Image.FromStream(barcode);
 				Show();
+
+				timeInOut.Text = "";
 			}
 
 			else if (tableEMP.Rows.Count > 0)
@@ -275,28 +283,40 @@ namespace ScanID
 				if(tableEMPattendance.Rows.Count == 0)
 				{
 					TryAdd(SearchBox.Text, today.ToLongDateString(), today.ToLongTimeString());
+					timeInOut.Text = "TIME IN: " +  today.ToLongTimeString();
+					timeInOut.ForeColor = Color.Green;
 				}
 				else
 				{
 					if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][4].ToString() == "")
 					{
 						TryUpdate(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+						timeInOut.Text = "TIME OUT: " + today.ToLongTimeString();
+						timeInOut.ForeColor = Color.Red;
 					}
 					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][5].ToString() == "")
 					{
 						TryUpdateIN2(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+						timeInOut.Text = "TIME IN: " + today.ToLongTimeString();
+						timeInOut.ForeColor = Color.Green;
 					}
 					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][6].ToString() == "")
 					{
 						TryUpdateOUT2(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+						timeInOut.Text = "TIME OUT: " + today.ToLongTimeString();
+						timeInOut.ForeColor = Color.Red;
 					}
 					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][7].ToString() == "")
 					{
 						TryUpdateIN3(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+						timeInOut.Text = "TIME IN: " + today.ToLongTimeString();
+						timeInOut.ForeColor = Color.Green;
 					}
 					else if (tableEMPattendance.Rows[0][2].ToString() == today.ToLongDateString() && tableEMPattendance.Rows[0][8].ToString() == "")
 					{
 						TryUpdateOUT3(tableEMP.Rows[0][0].ToString(), today.ToLongTimeString());
+						timeInOut.Text = "TIME OUT: " + today.ToLongTimeString();
+						timeInOut.ForeColor = Color.Red;
 					}
 
 
@@ -312,6 +332,7 @@ namespace ScanID
 				course_year.Text = "";
 				pictureBox1.Image = null;
 				pictureBox2.Image = null;
+				timeInOut.Text = "";
 			}
 		}
 
@@ -326,7 +347,7 @@ namespace ScanID
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-
+			timer1.Start();
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -429,6 +450,13 @@ namespace ScanID
 			{
 				db.closeConnection();
 			}
+		}
+
+		private void timer1_Tick(object sender, EventArgs e)
+		{
+
+			LabelDate.Text = DateTime.Now.ToLongDateString();
+			LabelTime.Text = DateTime.Now.ToLongTimeString();
 		}
 	}
 }
